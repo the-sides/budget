@@ -1,7 +1,8 @@
 const NEARBY_RADIUS_M = 250;
 const SEARCH_RADIUS_M = 5000;
 const FSQ_CATEGORIES = "13065,13145,13032"; // restaurant, fast food, café
-const FSQ_URL = "https://api.foursquare.com/v3/places/search";
+const FSQ_URL = "https://places-api.foursquare.com/places/search";
+const FSQ_API_VERSION = "2025-06-17";
 
 export const config = { runtime: "edge" };
 
@@ -49,7 +50,11 @@ export default async function handler(req: Request): Promise<Response> {
   let res: Response;
   try {
     res = await fetch(`${FSQ_URL}?${params}`, {
-      headers: { Authorization: apiKey, Accept: "application/json" },
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "X-Places-Api-Version": FSQ_API_VERSION,
+        Accept: "application/json",
+      },
     });
   } catch (err) {
     const ms = Date.now() - started;
