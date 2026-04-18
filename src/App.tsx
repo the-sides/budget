@@ -53,6 +53,13 @@ export function App() {
     );
   }, []);
 
+  async function remove(id: number) {
+    const prev = events;
+    setEvents(prev.filter(e => e.id !== id));
+    const res = await fetch(`/api/events?id=${id}`, { method: "DELETE" });
+    if (!res.ok) setEvents(prev);
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const c = Number(cost);
@@ -116,9 +123,19 @@ export function App() {
 
       <ul className="mt-8 flex flex-col gap-2">
         {events.map(ev => (
-          <li key={ev.id} className="flex justify-between border-b py-2 text-sm">
-            <span>{ev.name}</span>
-            <span className="font-mono">${(ev.cost_cents / 100).toFixed(2)}</span>
+          <li key={ev.id} className="group flex items-center justify-between border-b py-2 text-sm">
+            <span className="truncate">{ev.name}</span>
+            <div className="flex items-center gap-3">
+              <span className="font-mono">${(ev.cost_cents / 100).toFixed(2)}</span>
+              <button
+                type="button"
+                onClick={() => remove(ev.id)}
+                aria-label={`delete ${ev.name}`}
+                className="text-muted-foreground opacity-40 transition hover:text-destructive hover:opacity-100 group-hover:opacity-100"
+              >
+                ×
+              </button>
+            </div>
           </li>
         ))}
       </ul>
