@@ -1,4 +1,4 @@
-import { sql, type EventRow } from "../lib/db";
+import { sql, type EventRow } from "../lib/db.js";
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === "DELETE") {
@@ -6,9 +6,9 @@ export default async function handler(req: Request): Promise<Response> {
     if (!Number.isInteger(id) || id <= 0) {
       return Response.json({ error: "invalid id" }, { status: 400 });
     }
-    const rows = (await sql`DELETE FROM events WHERE id = ${id} RETURNING id`) as { id: number }[];
-    if (rows.length === 0) return Response.json({ error: "not found" }, { status: 404 });
-    return Response.json({ id: rows[0].id });
+    const [row] = (await sql`DELETE FROM events WHERE id = ${id} RETURNING id`) as { id: number }[];
+    if (!row) return Response.json({ error: "not found" }, { status: 404 });
+    return Response.json({ id: row.id });
   }
 
   if (req.method === "GET") {
