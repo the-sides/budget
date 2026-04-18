@@ -24,31 +24,30 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    async function lookup(query: string) {
+      try {
+        const res = await fetch(`/api/nearest-restaurant${query}`);
+        const data = (await res.json()) as { name: string | null };
+        console.log("nearest-restaurant", data);
+        if (data.name) setName(data.name);
+        else setDetectError("no restaurant found");
+      } catch {
+        setDetectError("lookup failed");
+      } finally {
+        setDetecting(false);
+      }
+    }
+
     if (!("geolocation" in navigator)) {
-      setDetecting(false);
-      setDetectError("geolocation unavailable");
+      lookup("");
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      async pos => {
-        try {
-          const { latitude, longitude } = pos.coords;
-          const res = await fetch(
-            `/api/nearest-restaurant?lat=${latitude}&lon=${longitude}`,
-          );
-          const data = (await res.json()) as { name: string | null };
-          if (data.name) setName(data.name);
-          else setDetectError("no restaurant nearby");
-        } catch {
-          setDetectError("lookup failed");
-        } finally {
-          setDetecting(false);
-        }
+      pos => {
+        const { latitude, longitude } = pos.coords;
+        lookup(`?lat=${latitude}&lon=${longitude}`);
       },
-      err => {
-        setDetecting(false);
-        setDetectError(err.message);
-      },
+      () => lookup(""),
       { enableHighAccuracy: true, timeout: 10000 },
     );
   }, []);
