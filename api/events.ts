@@ -1,5 +1,7 @@
 import { sql, type EventRow } from "../lib/db.js";
 
+export const config = { runtime: "edge" };
+
 export default async function handler(req: Request): Promise<Response> {
   if (req.method === "DELETE") {
     const id = Number(new URL(req.url).searchParams.get("id"));

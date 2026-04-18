@@ -1,6 +1,8 @@
 const NEARBY_RADIUS_M = 250;
 const FALLBACK_RADIUS_M = 5000;
 
+export const config = { runtime: "edge" };
+
 export default async function handler(req: Request): Promise<Response> {
   const url = new URL(req.url);
   const latQ = url.searchParams.get("lat");
